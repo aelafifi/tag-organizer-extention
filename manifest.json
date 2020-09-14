@@ -17,15 +17,15 @@
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "commands": {
-        "cmd01": {
+        "open_background_page_cmd": {
             "suggested_key": {
-                "default": "Ctrl+Shift+1"
+                "default": "Ctrl+Shift+H"
             },
             "description": "Window Groups"
         },
         "_execute_browser_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+2"
+                "default": "Ctrl+Shift+X"
             }
         }
     },

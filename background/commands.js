@@ -1,6 +1,6 @@
 chrome.commands.onCommand.addListener(function(command) {
 	switch (command) {
-	case "cmd01":
+	case "open_background_page_cmd":
 		chrome.tabs.create({
 			url: "/browser.html",
 		});
