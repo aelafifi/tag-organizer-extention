@@ -1,0 +1,99 @@
+body {
+    min-width: 700px;
+    font-size: 12px;
+}
+.clickable:hover {
+    cursor: pointer;
+    color: #36f;
+    text-decoration: underline;
+}
+h3 {
+    padding: 4px;
+    border-bottom: 1px solid #eee;
+}
+.actions {
+    float: right;
+}
+.italic {
+    font-style: italic;
+    color: #999;
+}
+.bold {
+    font-weight: bold;
+}
+
+.thumbnail {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.saved {
+    color: #999;
+    /*background: #efe;*/
+    border-right: 5px solid #6cf;
+}
+
+.opened {
+    font-style: normal;
+    color: inherit;
+}
+
+.saved:not(.opened) {
+    font-style: italic !important;
+}
+
+.ellapsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+li {
+    line-height: 20px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+li:hover {
+    background: #eee;
+}
+
+li .btn {
+    display: inline-block;
+    width: 16px;
+    padding: 0 !important;
+}
+
+li:not(:hover) .btn,
+li:hover .thumbnail {
+    display: none
+}
+
+.btn:focus,
+.form-control:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+@media all and (min-width: 800px) {
+    .all-windows {
+        column-count: 2;
+        column-span: none;
+    }
+
+    .all-windows > * {
+        -webkit-column-break-inside: avoid;
+    }
+}
+
+@media all and (min-width: 1200px) {
+    .all-windows {
+        column-count: 3;
+        column-span: none;
+    }
+
+    .all-windows > * {
+        -webkit-column-break-inside: avoid;
+    }
+}

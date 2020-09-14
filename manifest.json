@@ -1,0 +1,61 @@
+{
+    "manifest_version": 2,
+    "name": "Tab Organizer",
+    "version": "1.0.0",
+    "icons": {
+        "16": "icons/window-icon-16.png",
+        "48": "icons/window-icon-48.png",
+        "128": "icons/window-icon-128.png"
+    },
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "sessions",
+        "<all_urls>",
+        "storage",
+        "downloads"
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "commands": {
+        "cmd01": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+1"
+            },
+            "description": "Window Groups"
+        },
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+2"
+            }
+        }
+    },
+    "background": {
+        "scripts": [
+            "bg01.js",
+            "common_assets/lodash.js",
+            "common_assets/md5.js",
+            "diff.js",
+            "browser-api.js",
+            "browser-bg.js",
+            "browser-bg-exec.js"
+        ],
+        "persistent": true
+    },
+    "browser_action": {
+        "browser_style": false,
+        "default_popup": "browser.html",
+        "default_icon": "icons/window-icon-64.png",
+        "theme_icons": [
+            {
+                "light": "icons/window-icon-16.png",
+                "dark": "icons/window-icon-16.png",
+                "size": 16
+            },
+            {
+                "light": "icons/window-icon-32.png",
+                "dark": "icons/window-icon-32.png",
+                "size": 32
+            }
+        ]
+    }
+}

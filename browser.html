@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="common_assets/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/ha-fa5@5.2.6/css/fontawesome-all.min.css">
+	<link rel="stylesheet" type="text/css" href="browser.css">
+	<script src="common_assets/vue.js" type="text/javascript"></script>
+	<script src="common_assets/lodash.js" type="text/javascript"></script>
+	<script src="common_assets/md5.js" type="text/javascript"></script>
+	<script src="common_assets/jquery.min.js" type="text/javascript"></script>
+	<script src="common_assets/popper.js" type="text/javascript"></script>
+	<script src="common_assets/bootstrap.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div id="app" class="container-fluid pt-3">
+	<div class="card form-group">
+		<div class="card-body p-2">
+			<div class="row m-0">
+				<div class="col p-0">
+					<input class="form-control border-0" placeholder="Search..." v-model="searchText" autofocus="" />
+				</div>
+				<div class="col p-0" style="flex: 0 0 40px;">
+					<div class="dropdown">
+						<button class="btn bg-transparent" data-toggle="dropdown">
+							<i class="far fa-bars"></i>
+						</button>
+						<!-- TODO: options -->
+						<div class="dropdown-menu dropdown-menu-right">
+							<a class="dropdown-item" style="cursor: pointer;" @click="expandAll()">Expand All</a>
+							<a class="dropdown-item" style="cursor: pointer;" @click="collapseAll()">Collapse All</a>
+							<a class="dropdown-item" style="cursor: pointer;" @click="expandAllVisible()">Expand All Visible</a>
+							<a class="dropdown-item" style="cursor: pointer;" @click="collapseAllVisible()">Collapse All Visible</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" style="cursor: pointer;" @click="exportData()">Export</a>
+							<!-- TODO: add a functionality to import and compare -->
+							<a class="dropdown-item" style="cursor: pointer;" @click="importData()">Import <em class="text-muted small">(replace current)</em></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- TODO: total windows and tabs cound -->
+	<div class="form-group">
+		<div class="px-1 d-inline-block">
+			<strong>All:</strong>
+			<span>{{windows.length}} Windows</span>
+			<span>{{allTabs().length}} Tabs</span>
+		</div>
+		<div class="px-1 d-inline-block">
+			<strong>Opened:</strong>
+			<span>{{openedWindows.length}} Windows</span>
+			<span>{{allTabs(openedWindows).length}} Tabs</span>
+		</div>
+		<div class="px-1 d-inline-block" v-if="hasSearch()">
+			<strong>Filtered:</strong>
+			<span>{{filteredBySearch(allTabs()).length}} Tabs</span>
+		</div>
+		<div class="float-right">
+			<label class="px-1">
+				<input type="checkbox" v-model="ui.showOpened" />
+				<span>Show Opened</span>
+			</label>
+			<label class="px-1">
+				<input type="checkbox" v-model="ui.showSaved" />
+				<span>Show Saved</span>
+			</label>
+		</div>
+	</div>
+
+	<div class="all-windows">
+		<div class="card form-group" v-for="win in windows" :key="win.ui_id" v-if="win.exists && ((win.opened && ui.showOpened) || (win.saved && ui.showSaved))" :class="{saved: win.saved, opened: win.opened}">
+			<div class="card-body py-3">
+				<h6 class="card-title mb-0">
+					<button class="btn btn-sm bg-transparent" @click="toggleExpand(win.ui_id)">
+						<i class="far fa-chevron-right" :class="{'fa-rotate-90': ui.expanded[win.ui_id]}"></i>
+					</button>
+					<span class="clickable" @click="win.opened ? goTo(win) : open(win)" :class="{bold: currentWindow && win.id == currentWindow.id}">
+						{{win.title || "Window #" + win.id}}
+						<em><!-- TODO: count of tabs (after filteration) --></em>
+					</span>
+					<div class="float-right controls">
+						<!-- TODO: merge windows ??? -->
+						<button class="btn btn-link btn-sm py-0" @click="save(win)" v-if="!win.saved">
+							<i class="far fa-save fa-fw"></i> Save
+						</button>
+						<button class="btn btn-link btn-sm py-0" @click="save(win)" v-if="win.saved">
+							<!-- TODO: the same function with oppousite condition -->
+							<i class="far fa-edit fa-fw"></i> Rename
+						</button>
+						<button class="btn btn-link btn-sm py-0" @click="remove(win)" v-if="win.saved">
+							<i class="far fa-trash fa-fw"></i> Remove
+						</button>
+						<button class="btn btn-link btn-sm py-0" @click="close(win)" v-if="win.opened">
+							<i class="far fa-times fa-fw"></i> Close
+						</button>
+						<!-- <button class="btn btn-link btn-sm py-0" @click="goTo(win)" v-if="win.opened">
+							<i class="far fa-plane fa-fw"></i> Go To
+						</button> -->
+						<!-- <button class="btn btn-link btn-sm py-0" @click="open(win)" v-if="win.saved && !win.opened">
+							<i class="far fa-star fa-fw"></i> Open
+						</button> -->
+						<button class="btn btn-link btn-sm py-0" @click="unbind(win)" v-if="win.saved && win.opened">
+							<i class="far fa-unlink fa-fw"></i> Unbind
+						</button>
+						<button class="btn btn-link btn-sm py-0" @click="bind(win)" v-if="!win.saved && win.opened">
+							<i class="far fa-link fa-fw"></i> Bind
+						</button>
+					</div>
+				</h6>
+				<ul class="list-unstyled mb-0 mt-3" v-if="ui.expanded[win.ui_id] || hasSearch()"> <!-- TODO: should it be `fa-ul`? -->
+					<!-- TODO: move tabs ??? -->
+					<li v-for="tab in win.tabs" v-if="matchSearch(tab)">
+						<img :src="tab.favIconUrl" class="thumbnail">
+						<button class="btn btn-link text-danger far fa-trash" @click="removeTab(tab, win)"></button>
+						<span class="px-2 clickable" @click="win.opened ? goToTab(tab, win) : openTab(tab)">{{tab.title}}</span>
+						<button v-if="win.saved && !win.opened" class="btn btn-link far fa-external-link-alt" @click="openTab(tab, true)"></button>
+						<!-- TODO: icon for "is suspended" + suspend options -->
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- <pre>{{chromeStorage}}</pre> -->
+</div>
+
+<script src="diff.js" type="text/javascript"></script>
+<script src="browser-api.js" type="text/javascript"></script>
+<script src="browser.js" type="text/javascript"></script>
+
+</body>
+</html>
