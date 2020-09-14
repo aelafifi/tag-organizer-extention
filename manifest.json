@@ -31,13 +31,13 @@
     },
     "background": {
         "scripts": [
-            "bg01.js",
-            "common_assets/lodash.js",
-            "common_assets/md5.js",
+            "vendors/lodash.js",
+            "vendors/md5.js",
             "diff.js",
             "browser-api.js",
-            "browser-bg.js",
-            "browser-bg-exec.js"
+            "background/commands.js",
+            "background/browser-bg.js",
+            "background/browser-bg-exec.js"
         ],
         "persistent": true
     },
